@@ -2,17 +2,22 @@
 
 A calm, personalized morning briefing skill for ChatGPT and Codex.
 
-Morning Brief turns connected calendar and inbox context, local weather, verified news, a technology radar, and one approachable concept into a single polished HTML briefing. It is designed for a quick morning glance rather than an exhaustive dashboard.
+Morning Brief turns connected calendar and inbox context, local weather, verified news, a technology radar, and one approachable concept into a single polished HTML briefing. The opening stays easy to scan, while the news, technology analysis, and concept sections provide enough depth to be useful.
 
 > This is an independent open-source project. It is not affiliated with or endorsed by OpenAI.
 
 ## Features
 
 - Summarizes the shape of today from connected calendars
+- Writes a one-sentence editorial headline about the character of the day
+- Describes the schedule in three natural, narrative time windows
 - Separates items that need attention from recently resolved matters
+- Explains each attention or resolved item with its date, status, deadline, and relevance
 - Supports archived and inbox email searches
 - Uses configurable locations and authoritative weather sources
-- Includes source-linked news, three technology radar items, and a concept of the day
+- Groups verified news into five configurable categories with up to two items each
+- Synthesizes two or three connected technology currents instead of listing article summaries
+- Explains one approachable concept from analogy through mechanism, practical meaning, and limitations
 - Produces one responsive, standalone HTML file
 - Bundles its fonts and font license notices into the generated HTML
 - Keeps all source connectors read-only while creating a brief
@@ -63,6 +68,9 @@ Edit only the values you need. The profile supports:
 - inbox lookback and classification rules
 - preferred weather and air-quality sources
 - news categories and item counts
+- editorial voice, headline style, narrative schedule observations, and list depth
+- technology-radar flows and concept-of-the-day depth
+- exact layout, type scale, numbered-list treatment, and terrain decoration
 - section order, relationships, and delivery caption
 - automation schedule and success-notification preference
 
@@ -93,12 +101,36 @@ me after a successful delivery.
 
 Create the recurring schedule with the automation feature of the host platform. The skill itself does not install a background service or silently create a schedule.
 
+### Cloud and scheduled-task packaging
+
+A cloud task cannot read a profile that exists only on your local drive. Before uploading the skill to a cloud host:
+
+1. Copy `references/profile.example.yaml` to `references/profile.yaml`.
+2. Add only preferences and source labels; never add credentials.
+3. Zip the skill directory contents so `SKILL.md` is at the root of the archive.
+4. Include `agents/`, `assets/`, `references/`, and `scripts/`.
+5. Exclude `.git/`, `outputs/`, test artifacts, and earlier generated briefs.
+
+Use separate archives for public distribution and personal cloud use. The public archive or GitHub repository should contain only `profile.example.yaml`; a private personal archive may also contain the ignored `profile.yaml`.
+
+For a cloud scheduled task, explicitly select or invoke the uploaded skill and keep the task prompt narrow:
+
+```text
+Use $morning-brief and read references/profile.yaml. Apply safety, read-only,
+and fact-verification rules first; then explicit run-specific choices in this
+prompt; then profile.yaml; then general SKILL.md defaults. Create one verified
+standalone HTML brief in the configured language and timezone.
+```
+
 ## Output
 
 The generated briefing uses:
 
-- a calm editorial layout with no card-heavy dashboard chrome
+- two full-width background bands around an 860px editorial column
+- a warm, conversational voice that stays precise about facts
+- open numbered rows rather than cards, badges, boxes, or dashboard chrome
 - a calendar terrain line with markers calculated from the SVG path
+- an explicit desktop and mobile typography hierarchy
 - explicitly styled dark-gray links in every browser state
 - responsive layout for desktop and mobile
 - no remote fonts, scripts, images, or other runtime assets

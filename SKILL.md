@@ -5,7 +5,7 @@ description: Create or schedule a personalized, calm morning briefing as one ver
 
 # Personal Morning Brief
 
-Create a 30-second morning glance: show the shape of the user's day, what needs attention, what recently resolved, and any configured information sections. On unattended runs, proceed without questions.
+Create a calm, editorial morning read: show the character of the user's day, what needs attention, what recently resolved, and the configured information sections. Keep the opening easy to scan, then give the news, technology analysis, and concept enough depth to be genuinely useful. On unattended runs, proceed without questions.
 
 ## Load customization
 
@@ -14,6 +14,7 @@ Read `references/profile.yaml` when it exists. Otherwise read `references/profil
 - In an interactive setup, ask only for fields that cannot be inferred from the user's request or connected data. Never ask for secrets.
 - If no profile exists during an unattended run, use the account language, home timezone, neutral address, connected sources, and default sections. Do not invent personal facts or locations.
 - Treat profile values as preferences, not credentials. Use connectors for private data.
+- Resolve instructions in this order: safety, read-only, and fact-verification rules in this skill; explicit run-specific choices in the current user or scheduled-task prompt; `profile.yaml`; then the defaults in this skill. A run-specific choice overrides only the field it names. Do not let a vague request such as “make my brief” erase profile preferences.
 
 ## Safety
 
@@ -32,11 +33,13 @@ Use the configured home timezone and the connectors currently available. Skip mi
 4. **Resolved:** Include only recent closures worth knowing, such as a reply received, delivery, payment/cancellation confirmation, transferred ownership, cancelled meeting, or shipped work.
 5. **Weather:** Fetch every configured home location and conditionally configured commute locations. Prefer the user's specified authoritative sources; otherwise use official national weather and air-quality sources. Include precipitation probability and amount only when published for the relevant location and period. Never convert “clear” into invented `0%` or `0 mm`.
 6. **News:** Research the configured categories and counts. Prefer the past 24–48 hours, verify publication date and underlying report, and link each item to a primary source or reputable report. Omit a category rather than pad it with stale, duplicated, or unverified material.
-7. **Tech radar and concept:** When enabled, provide three distinct material technology items by default and one approachable but substantive concept. Widen the radar to seven days only when necessary and show dates.
+7. **Tech radar and concept:** When enabled, synthesize two or three material technology currents and one approachable but substantive concept. Widen the radar to seven days only when necessary and show dates.
 
 ## Sort and write
 
 Write every visible sentence and the delivery caption in the configured language and tone.
+
+For Korean, address the reader directly but lightly. Prefer natural, warm polite endings such as `~예요`, `~왔어요`, and `~죠`, with `~입니다` where the sentence needs firmness. Vary endings so the prose sounds spoken rather than mechanically converted. Keep the facts exact without sounding like a formal report. Do not use exaggeration, orders, empty encouragement, pressure, guilt, or self-congratulatory language.
 
 Use this default order unless the profile overrides it:
 
@@ -47,11 +50,15 @@ Use this default order unless the profile overrides it:
 5. Tech radar
 6. Concept of the day
 
-- Address the user using the configured form. Write one natural headline that names either the day's distinctive event or its shape, never both.
+- Address the user using the configured form. Write the headline as one complete sentence that tells the user what kind of day today is. Interpret the day's center of gravity, pace, transition, or contrast instead of merely listing its largest appointment. A suitable Korean pattern is “오늘은 오전의 여유 뒤로 오후 일정이 차분히 이어지는 날이에요.”
 - Classify the calendar only: HEAVY for roughly six-plus scheduled hours or a cluster of three or more; OPEN for no more than one short event; NORMAL otherwise.
 - If no events exist, state that plainly and add one light, warm observation. Do not manufacture tasks or urgency.
-- Add three time-based observations below the terrain. They must describe the calendar and must not repeat the attention lists.
-- Use one linked title and one concise source-grounded sentence per list or news item. A missing section stays absent; do not apologize or narrate the research process.
+- Add three narrative, time-based observations below the terrain. Use natural windows derived from the actual day, such as `오전–정오`, `정오–오후 6시`, and `오후 6시 이후`; do not force those exact boundaries when the calendar suggests better ones. Each observation should describe how that part of the day unfolds and must not repeat the attention lists.
+- Render Needs attention and Resolved as numbered lists. Give each item a linked factual title followed by two or three complete sentences covering the relevant date, deadline or effective period, current state, and why the user should know it now. If a field does not exist, omit it rather than infer it.
+- In News, use the configured five groups: AI and technology, economy and finance, domestic, world, and light conversation. Include no more than two verified items per group. For each item, state the publication or event date and at least one concrete figure when the source provides a meaningful figure; never manufacture a number just to satisfy the format.
+- Write Tech radar as several connected paragraphs about two or three technology currents, not as a list of three article summaries. Explain what changed, why it matters in practice, and how the items reinforce, constrain, or contradict one another. Use dated, linked evidence, but make the synthesis—not the article count—the organizing structure.
+- Write Concept of the day in three to five paragraphs. Start with an everyday analogy, then explain the mechanism, practical meaning, and limitations in that order. Connect it to the day's technology news only when the connection is real and helpful.
+- A missing section stays absent; do not apologize, expose scratch work, or narrate the research process. Never write phrases such as “검증되지 않아 생략했다” in the brief itself.
 - Observe and hand over. Avoid commands, hype, guilt, filler encouragement, and process narration.
 
 ## Build the standalone HTML
@@ -67,6 +74,14 @@ Create two full-bleed bands with a maximum content width of 860px:
 - one clay accent `#C6613F`
 
 Use no cards, badges, buttons, chips, rounded containers, remote assets, footer timestamps, or decorative filler.
+
+Match this editorial hierarchy:
+
+- On desktop, use `.inner { max-width: 860px; margin: 0 auto; padding: 64px 40px 52px; }` and use `56px 40px 80px` for the lower band.
+- Use a 13px date line; a 40px serif headline at 1.36 line-height; 12.5px observation labels and 14px observation text; 13px section headings with `0.10em` tracking; 15.5px item titles; 14px item descriptions; and 14.5px long-form prose at 1.8 line-height.
+- Separate major lower-band sections with about 52px of vertical space. Use hairlines only between the three schedule observations and stack them on mobile.
+- Build numbered lists as open rows, not containers: a muted 22px number column, a 16px gap, and a flexible text column. Do not add row backgrounds or borders.
+- At 640px and below, use 22px side padding, reduce the headline to 30px, and preserve generous 40–60px vertical breathing room.
 
 ### Fonts
 
@@ -102,7 +117,7 @@ Draw one unbroken SVG terrain line whose elevation reflects calendar load. Put e
 </script>
 ```
 
-Never hand-estimate marker coordinates. Keep decorative motifs clearly separate from schedule markers.
+Never hand-estimate marker coordinates. Keep decorative motifs clearly separate from schedule markers. Use at most two restrained line motifs, such as a clay sun or small birds, only when they reinforce the day's visual rhythm; the terrain remains the dominant illustration.
 
 ### Links and responsive layout
 

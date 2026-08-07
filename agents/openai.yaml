@@ -1,4 +1,4 @@
 interface:
   display_name: "Morning Brief"
-  short_description: "Personalized calendar, inbox, weather, and news brief"
-  default_prompt: "Use $morning-brief to create my personalized morning brief."
+  short_description: "Editorial calendar, inbox, weather, news, and tech brief"
+  default_prompt: "Use $morning-brief to create today's verified editorial morning brief."
