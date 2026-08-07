@@ -1,0 +1,17 @@
+Morning Maru Font Modification Log
+==================================
+
+2026
+----
+
+- Source font: MaruBuri SemiBold, distributed under the SIL Open Font
+  License, Version 1.1.
+- The bundled webfont is a reduced subset prepared for the Morning Brief
+  standalone HTML layout.
+- The font family's internal and display names were changed to "Morning Maru"
+  to avoid use of the original Reserved Font Name in a modified font.
+- The modified font is embedded as WOFF2 data inside fonts-embedded.css.
+- This distribution is independent and is not affiliated with or endorsed by
+  the original font author or distributor.
+- The original license notice is preserved in MaruBuri-OFL.txt and is also
+  embedded into generated HTML by scripts/inline-font-css.mjs.

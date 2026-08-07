@@ -1,0 +1,4 @@
+interface:
+  display_name: "Morning Brief"
+  short_description: "Personalized calendar, inbox, weather, and news brief"
+  default_prompt: "Use $morning-brief to create my personalized morning brief."

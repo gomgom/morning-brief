@@ -1,0 +1,14 @@
+# Personal configuration
+references/profile.yaml
+
+# Generated briefing artifacts
+outputs/
+
+# Local render and test artifacts
+*.log
+*.tmp
+brief.png
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db

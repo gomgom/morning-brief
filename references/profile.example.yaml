@@ -1,0 +1,92 @@
+# Copy this file to profile.yaml and replace only the values you need.
+# Do not put passwords, API keys, OAuth tokens, or other secrets here.
+
+identity:
+  display_name: "Your name"
+  address_as: "Your preferred form of address"
+  language: "auto"
+  tone: "concise, calm, friendly, respectful"
+  timezone: "Use account timezone"
+  delivery_caption: "Your morning brief is ready."
+
+locations:
+  home:
+    label: "Home"
+    query: "City, region, country"
+    always_include: true
+  commute:
+    label: "Work"
+    query: "City, region, country"
+    include_on: ["MON", "TUE", "WED", "THU", "FRI"]
+    skip_on_holidays: true
+    skip_when_off_work: true
+
+calendar:
+  included_calendars: ["primary"]
+  holiday_calendars: []
+  home_timezone: "Use identity.timezone"
+  work_status:
+    enabled: false
+    calendar: ""
+    off_period_keywords: ["vacation start"]
+    return_keywords: ["return to work"]
+    explicit_workday_keywords: ["workday"]
+
+inbox:
+  providers: ["connected email"]
+  search_everywhere: true
+  extra_queries: []
+  lookback_days: 7
+  attention_rules:
+    - "Unanswered direct request"
+    - "Deadline or reversible window closing soon"
+    - "Verified security or billing issue"
+  resolved_rules:
+    - "Delivery, payment, cancellation, or transfer confirmation"
+    - "A thread question that received a useful answer"
+
+weather:
+  preferred_sources: ["official national weather service"]
+  air_quality_sources: ["official local air-quality service"]
+  mention_air_quality_when: "moderate all day or unhealthy at least once"
+  mention_uv_when: "strong"
+  require_published_precipitation_numbers: true
+
+news:
+  lookback_hours: 48
+  categories:
+    - name: "AI and technology"
+      count: 3
+    - name: "Economy and finance"
+      count: 2
+    - name: "Domestic"
+      count: 2
+    - name: "World"
+      count: 2
+    - name: "Light conversation"
+      count: 1
+  tech_radar_count: 3
+  concept_enabled: true
+
+sections:
+  order:
+    - "Needs attention"
+    - "Resolved"
+    - "Weather"
+    - "News"
+    - "Tech radar"
+    - "Concept of the day"
+
+relationships: []
+# Example:
+# relationships:
+#   - person: "Name"
+#     relation: "partner"
+#   - person: "Name"
+#     relation: "child"
+#     birth_date: "YYYY-MM-DD"
+
+automation:
+  schedule: "daily at 07:00"
+  notify_on_success: true
+
