@@ -44,7 +44,13 @@ For Codex, a common personal installation path is:
 ~/.agents/skills/morning-brief
 ```
 
-After installation, restart or refresh the host if the skill does not appear immediately.
+In the ChatGPT desktop app or Codex you can also ask the built-in **Skill Installer** to do it:
+
+```text
+$skill-installer Install the skill at the root of the GitHub repository gomgom/morning-brief as morning-brief.
+```
+
+After installation, restart or refresh the host if the skill does not appear immediately. A locally installed skill only runs on that computer; for a schedule that runs while your computer is off, see [Run every morning in ChatGPT (cloud)](#run-every-morning-in-chatgpt-cloud).
 
 ## Personalization
 
@@ -101,9 +107,51 @@ scripts/verify_brief.py until it prints OK, and deliver the HTML file.
 
 Create the recurring schedule with the automation feature of the host platform. The skill itself does not install a background service or silently create a schedule.
 
-### Cloud and scheduled-task packaging
+### Run every morning in ChatGPT (cloud)
 
-A cloud task cannot read a profile that exists only on your local drive. Before uploading the skill to a cloud host:
+This setup was tested in the ChatGPT desktop app (Work mode) in October 2026. Menus may change.
+
+**Why the prompt downloads the repository.** A scheduled task runs in a fresh cloud workspace. Skills installed on your computer (for example `~/.codex/skills`) are not available there. At the time of writing, the schedule dialog also cannot pick a Codex cloud environment. Downloading this public repository at the start of every run is the reliable way to get `SKILL.md` and the scripts. It also means every run uses the latest version.
+
+1. **Connect your sources.** In **Settings → Plugins**, connect the tools your profile uses, for example Google Calendar, Gmail, and Notion.
+2. **Prepare the topic log (optional).** Create the page described in [Topic log](#topic-log-optional) and share it with the ChatGPT connection (in Notion: page menu **•••** → **Connections**). If the page does not exist, the run reports it and continues without it.
+3. **Create the task.** Open the **Scheduled** page (clock icon in the sidebar) and create a new task. Set the repeat, the time, and the time zone under **Advanced**. Leave **Run on this computer** off so the task runs in the cloud.
+4. **Paste the prompt below,** with your `profile.yaml` at the end. The run saves it as `references/profile.yaml`. The prompt stays private to your account, and nothing is pushed to GitHub.
+5. **Run it once by hand** and check three things: an HTML file is attached, the run reports that `verify_brief.py` printed OK, and the topic log gained a line.
+
+```text
+[Setup — do this first]
+In the working folder run: git clone --depth 1 https://github.com/gomgom/morning-brief.git
+If git is unavailable, download https://github.com/gomgom/morning-brief/archive/refs/heads/main.zip
+with python3 and extract it. Move into that folder, read SKILL.md at its root, and follow it to
+create today's morning brief. This is an unattended run: do not ask questions. If the download
+fails, do not pause the schedule; say why in one line and send a plain-text summary instead.
+
+Do not run development checks and never deliver the example brief.
+Do not commit, push, or open pull requests.
+
+[Profile] Save the YAML at the end of this prompt as references/profile.yaml and apply it.
+[Language and timezone] Korean, Asia/Seoul.
+[Build] Write outputs/brief.json, render it with python3 scripts/render_brief.py outputs/brief.json,
+run python3 scripts/verify_brief.py on the printed path, and deliver the HTML only when it prints OK.
+[Topic log] If topic_log is enabled, read the page before choosing topics and append today's
+topics after delivery. Never change anything else on it.
+
+--- profile.yaml ---
+(paste your profile.yaml here)
+```
+
+What to expect:
+
+- A run takes about five minutes.
+- Cloud workspaces usually have no browser, so the screenshot check is skipped and `verify_brief.py` is the check.
+- If a run says `SKILL.md` or the scripts are missing, the setup block did not run. Check that the prompt starts with it.
+
+**Codex cloud environments.** You can also create a Codex cloud environment from this repository for manual runs. Its onboarding may save start instructions that render the example brief on every task. Trim those to brief-only steps so the example is never delivered.
+
+### Uploading a zip
+
+A cloud host that installs skills from an archive cannot read a profile that exists only on your local drive. Before uploading:
 
 1. Copy `references/profile.example.yaml` to `references/profile.yaml`.
 2. Add only preferences and source labels; never add credentials.
@@ -118,17 +166,17 @@ A cloud task cannot read a profile that exists only on your local drive. Before 
 
 Use separate archives for public distribution and personal cloud use. The public archive or GitHub repository should contain only `profile.example.yaml`; a private personal archive may also contain the ignored `profile.yaml`.
 
-For a cloud scheduled task, explicitly select or invoke the uploaded skill and keep the task prompt narrow:
+When you schedule an uploaded skill, invoke it explicitly and keep the task prompt narrow:
 
 ```text
 Use $morning-brief and read references/profile.yaml. Apply safety, read-only,
 and fact-verification rules first; then explicit run-specific choices in this
-prompt; then profile.yaml; then general SKILL.md defaults. Write brief.json,
+prompt; then profile.yaml; then general SKILL.md defaults. Write outputs/brief.json,
 render it with scripts/render_brief.py, and deliver it only after
 scripts/verify_brief.py prints OK. Write in the configured language and timezone.
 ```
 
-Before relying on the schedule, run it once by hand. Confirm that the host can execute `python3` inside the skill directory and can reach your connectors from a scheduled run.
+Before relying on the schedule, run it once by hand. Confirm that the scheduled run can actually see the uploaded skill, can execute `python3` inside the skill directory, and can reach your connectors. If it cannot see the skill, use the download-based prompt above instead.
 
 ### Topic log (optional)
 
@@ -148,8 +196,8 @@ Morning Brief is Korean-first and also supports English: the bundled serif cover
 
 1. Gather from connected tools, read-only.
 2. Sort candidates into Needs attention and Resolved.
-3. Write `brief.json` following `references/brief.schema.json`. `references/brief.example.json` is a complete example.
-4. `python3 scripts/render_brief.py brief.json` writes `outputs/brief-YYYY-MM-DD.html`. It never overwrites an earlier brief.
+3. Write `outputs/brief.json` following `references/brief.schema.json`. `references/brief.example.json` is a complete example.
+4. `python3 scripts/render_brief.py outputs/brief.json` writes `outputs/brief-YYYY-MM-DD.html`. It never overwrites an earlier brief.
 5. `python3 scripts/verify_brief.py outputs/brief-YYYY-MM-DD.html` must print `OK`. If it does not, fix the JSON and render again.
 6. Deliver the HTML file.
 

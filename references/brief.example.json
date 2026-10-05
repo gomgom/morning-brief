@@ -1,7 +1,8 @@
 {
-  "date": "2026-10-05",
+  "date": "2026-01-05",
+  "timezone": "Asia/Seoul",
   "lang": "ko",
-  "date_line": "월요일 · 2026년 10월 5일",
+  "date_line": "월요일 · 2026년 1월 5일",
   "headline": "오전에 회의가 몰려 있다가, 지수님, 오후 세 시부터는 하루가 넓게 열려요.",
   "day_class": "HEAVY",
   "acts": [

@@ -640,7 +640,15 @@ def output_path(data, out):
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(data["date"])):
         raise BriefError('date: expected "YYYY-MM-DD"')
     folder = Path.cwd() / "outputs"
-    now = dt.datetime.now()
+    now = dt.datetime.now(dt.timezone.utc)
+    tz_name = data.get("timezone")
+    if tz_name:
+        try:
+            from zoneinfo import ZoneInfo
+
+            now = now.astimezone(ZoneInfo(tz_name))
+        except Exception:
+            warn(f"unknown timezone {tz_name!r}; using UTC for the file name")
     for suffix in ("", now.strftime("-%H%M"), now.strftime("-%H%M%S")):
         path = folder / f"brief-{data['date']}{suffix}.html"
         if not path.exists():
