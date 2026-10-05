@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Morning Brief data",
+  "description": "The only thing the model writes. scripts/render_brief.py turns it into the standalone HTML page. All strings are plain text; the renderer escapes them.",
+  "type": "object",
+  "required": ["date", "date_line"],
+  "properties": {
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "description": "Today in the home timezone; used for the output file name." },
+    "lang": { "type": "string", "description": "BCP 47 language of every visible sentence, e.g. \"ko\" or \"en\". RTL languages mirror the page." },
+    "date_line": { "type": "string", "description": "Small line above the headline, e.g. \"월요일 · 2026년 10월 5일\"." },
+    "headline": { "type": "string", "description": "One serif sentence. Required unless page_message is used." },
+    "day_class": { "enum": ["HEAVY", "NORMAL", "OPEN"], "description": "Optional. The renderer recomputes it from events and warns on a mismatch." },
+    "page_message": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Only when nothing at all is connected: two friendly sentences that replace the whole page."
+    },
+    "acts": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "description": "Three time windows under the drawing, each one third of the terrain width.",
+      "items": {
+        "type": "object",
+        "required": ["range", "sentence"],
+        "properties": {
+          "start": { "type": "string", "pattern": "^\\d{1,2}:\\d{2}$" },
+          "end": { "type": "string", "pattern": "^\\d{1,2}:\\d{2}$" },
+          "range": { "type": "string", "description": "Display label, e.g. \"오전 9:30 – 오후 1시\"." },
+          "sentence": { "type": "string", "description": "One observation earned from the calendar." }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "description": "Today's calendar events only. No titles: the drawing shows shape, not names.",
+      "items": {
+        "type": "object",
+        "required": ["start", "end"],
+        "properties": {
+          "start": { "type": "string", "pattern": "^\\d{1,2}:\\d{2}$" },
+          "end": { "type": "string", "pattern": "^\\d{1,2}:\\d{2}$" },
+          "optional": { "type": "boolean", "description": "Optional or unanswered: grey and weightless." },
+          "overlap": { "type": "boolean", "description": "Part of a genuine double booking: drawn as a hollow circle." }
+        }
+      }
+    },
+    "motifs": {
+      "type": "array",
+      "description": "At most one per act. Clay on at most one motif in the whole drawing.",
+      "items": {
+        "type": "object",
+        "required": ["kind"],
+        "properties": {
+          "kind": {
+            "enum": ["sun", "half_sun", "moon", "birds", "fireworks", "flag", "ridge"],
+            "description": "sun = open creative time; half_sun = start before 7:30; moon = late finish; birds = room to breathe; fireworks = holiday eve; flag = deadline; ridge = depth on a HEAVY day (no act)."
+          },
+          "act": { "enum": [0, 1, 2] },
+          "clay": { "type": "boolean" }
+        }
+      }
+    },
+    "attention": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+    "resolved": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+    "empty_line": { "type": "string", "description": "Override for the calm line shown when both lists are empty." },
+    "connect_hint": { "type": "string", "description": "One line inviting an inbox or chat connection when only the calendar is connected." },
+    "labels": {
+      "type": "object",
+      "properties": {
+        "attention": { "type": "string" },
+        "resolved": { "type": "string" },
+        "empty": { "type": "string" }
+      }
+    },
+    "buttons_enabled": {
+      "type": "boolean",
+      "description": "true only when the invocation contains the exact phrase \"Include action buttons\"."
+    },
+    "sections": {
+      "type": "array",
+      "description": "Enabled optional sections, in profile order, rendered below Resolved. A section with nothing found is left out.",
+      "items": {
+        "type": "object",
+        "required": ["heading"],
+        "properties": {
+          "heading": { "type": "string" },
+          "paragraphs": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "object",
+                  "required": ["text"],
+                  "properties": {
+                    "text": { "type": "string" },
+                    "links": { "type": "array", "items": { "$ref": "#/$defs/link" } }
+                  }
+                }
+              ]
+            }
+          },
+          "items": { "type": "array", "items": { "$ref": "#/$defs/item" } }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "link": {
+      "type": "object",
+      "required": ["phrase", "url"],
+      "properties": {
+        "phrase": { "type": "string", "description": "Exact substring of the text that becomes the link." },
+        "url": { "type": "string", "pattern": "^https://" }
+      }
+    },
+    "item": {
+      "type": "object",
+      "required": ["title", "sentence"],
+      "properties": {
+        "title": { "type": "string", "description": "≤10 words, in the user's words; never a copied subject line." },
+        "sentence": { "type": "string", "description": "Source in prose plus the substance." },
+        "url": { "type": "string", "pattern": "^https://" },
+        "source_phrase": { "type": "string", "description": "Exact substring of sentence that links to url, e.g. \"#launch 채널\"." },
+        "links": { "type": "array", "items": { "$ref": "#/$defs/link" } },
+        "button": {
+          "type": "object",
+          "required": ["label", "seed"],
+          "properties": {
+            "label": { "type": "string", "description": "Imperative, ≤5 words." },
+            "seed": { "type": "string", "description": "Self-contained work order for a fresh ChatGPT chat; no third-party words." }
+          }
+        }
+      }
+    }
+  }
+}

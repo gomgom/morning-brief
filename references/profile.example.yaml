@@ -9,12 +9,6 @@ identity:
   timezone: "Use account timezone"
   delivery_caption: "Your morning brief is ready."
 
-editorial:
-  headline: "Describe the day's center of gravity, pace, transition, or contrast in one complete sentence addressed naturally to the reader; do not merely restate the largest appointment."
-  schedule_observations: "Divide the actual day into three natural time windows and describe how each part unfolds without repeating the attention lists."
-  attention_and_resolved: "Use numbered lists. Give each item two or three sentences covering the relevant date, deadline or effective period, current state, and why it matters now. Omit fields that are not known."
-  prohibited_voice: ["exaggeration", "commands", "empty encouragement", "guilt", "research-process narration", "statements about omitted unverified material"]
-
 locations:
   home:
     label: "Home"
@@ -42,53 +36,71 @@ inbox:
   providers: ["connected email"]
   search_everywhere: true
   extra_queries: []
-  lookback_days: 7
+  unanswered_lookback_days: 7
+  fallback: "unread mail from the last 2 days"
+  not_a_bottleneck: "A group @-mention, team alias, or team review request that anyone on the list could answer."
   attention_rules:
     - "Unanswered direct request"
-    - "Deadline or reversible window closing soon"
+    - "Deadline or reversible window closing today"
     - "Verified security or billing issue"
   resolved_rules:
     - "Delivery, payment, cancellation, or transfer confirmation"
-    - "A thread question that received a useful answer"
+    - "A thread question that someone else answered"
 
-weather:
-  preferred_sources: ["official national weather service"]
-  air_quality_sources: ["official local air-quality service"]
-  mention_air_quality_when: "moderate all day or unhealthy at least once"
-  mention_uv_when: "strong"
-  require_published_precipitation_numbers: true
+chat:
+  providers: ["connected chat"]
+  lookback_days: 2
+  reply_rule: "An emoji reaction to the ask counts as a reply."
+  prep_search_days: 7
 
-news:
-  lookback_hours: 48
-  verification: "Use only items whose original source and publication date have been verified. Omit sparse categories instead of padding them."
-  categories:
-    - name: "AI and technology"
-      max_count: 2
-    - name: "Economy and finance"
-      max_count: 2
-    - name: "Domestic"
-      max_count: 2
-    - name: "World"
-      max_count: 2
-    - name: "Light conversation"
-      max_count: 2
-  item_rule: "Include the publication or event date and a meaningful concrete figure when the source provides one. Never invent a number to fill the format."
-  tech_radar_flow_count: "2-3"
-  tech_radar_lookback_hours: 72
-  tech_radar_extended_lookback_days: 7
-  tech_radar_topics: ["AI", "developer tools", "local models", "open weights", "computer science"]
-  tech_radar_rule: "Do not list three short article summaries. Synthesize two or three technology currents across several paragraphs: what changed, why it matters, and how the developments connect, constrain, or contradict one another."
-  concept_enabled: true
-  concept_rule: "Explain a different computing, AI, or software concept in three to five paragraphs. Start with an analogy, then cover the mechanism, practical meaning, and limitations. Connect it to today's news only when the connection is real."
+buttons:
+  # Buttons render only when the run prompt contains the exact phrase
+  # "Include action buttons". Keep this false unless you add that phrase.
+  enabled: false
+  origin: "https://chatgpt.com/"
 
 sections:
-  order:
-    - "Needs attention"
-    - "Resolved"
-    - "Weather"
-    - "News"
-    - "Tech radar"
-    - "Concept of the day"
+  # Core lists are fixed: Needs attention, then Resolved.
+  core: ["Needs attention", "Resolved"]
+  # Optional sections render below Resolved, in this order, only when enabled.
+  optional:
+    - id: "weather"
+      enabled: true
+      heading: "Weather"
+      preferred_sources: ["official national weather service"]
+      air_quality_sources: ["official local air-quality service"]
+      mention_air_quality_when: "moderate all day or unhealthy at least once"
+      mention_uv_when: "strong"
+      require_published_precipitation_numbers: true
+    - id: "news"
+      enabled: true
+      heading: "News"
+      lookback_hours: 48
+      verification: "Use only items whose original source and publication date have been verified. Omit sparse categories instead of padding them."
+      categories:
+        - name: "AI and technology"
+          max_count: 2
+        - name: "Economy and finance"
+          max_count: 2
+        - name: "Domestic"
+          max_count: 2
+        - name: "World"
+          max_count: 2
+        - name: "Light conversation"
+          max_count: 2
+      item_rule: "Include the publication or event date and a meaningful concrete figure when the source provides one. Never invent a number to fill the format."
+    - id: "tech_radar"
+      enabled: true
+      heading: "Tech radar"
+      flow_count: "2-3"
+      lookback_hours: 72
+      extended_lookback_days: 7
+      topics: ["AI", "developer tools", "local models", "open weights", "computer science"]
+      rule: "Do not list short article summaries. Synthesize two or three currents across several paragraphs: what changed, why it matters, and how the developments connect, constrain, or contradict one another."
+    - id: "concept"
+      enabled: true
+      heading: "Concept of the day"
+      rule: "Explain a different computing, AI, or software concept in three to five paragraphs. Start with an analogy, then cover the mechanism, practical meaning, and limitations. Connect it to today's news only when the connection is real."
 
 relationships: []
 # Example:
@@ -100,23 +112,11 @@ relationships: []
 #     birth_date: "YYYY-MM-DD"
 
 automation:
-  schedule: "daily at 07:00"
+  schedule: "weekdays at 07:00"
   notify_on_success: true
   unattended: true
   source_boundary: "Use connected calendars, email, chat, and task sources read-only. Do not create, modify, send, delete, archive, label, react, or reschedule source data."
   instruction_precedence: "Apply safety, read-only, and fact-verification rules first; then explicit run-specific choices in the current prompt; then this profile; then general SKILL.md defaults. A run-specific prompt overrides only the fields it names."
 
-design:
-  font_css: "assets/fonts/fonts-embedded.css"
-  headline_font: '"Fraunces", "Morning Maru", "Noto Serif KR", Georgia, serif'
-  bands: "Two full-width bands: #F9F9F7 above and #FCFCFB below, with a maximum content width of 860px."
-  desktop_spacing: "Upper content 64px 40px 52px; lower content 56px 40px 80px; about 52px between major sections."
-  mobile_spacing: "At 640px and below, use 22px side padding; upper 44px 22px 40px; lower 40px 22px 60px."
-  type_scale: "Date 13px; headline 40px/1.36 and 30px on mobile; observation labels 12.5px; observation text 14px; section headings 13px with 0.10em tracking; item titles 15.5px; descriptions 14px; long-form prose 14.5px/1.8."
-  numbered_lists: "Use open rows with no backgrounds or borders: a muted 22px number column, a 16px gap, and a flexible text column."
-  link_color: "#3E3D38 in all states"
-  terrain_markers: "Place every schedule marker with getTotalLength() and getPointAtLength() on #terrain-path."
-  terrain_decoration: "Keep one unbroken terrain line dominant. Use at most two small line motifs, such as a clay sun or birds, only when they reinforce the day's rhythm."
-  prohibit: ["cards", "buttons", "badges", "chips", "boxes", "rounded containers", "row backgrounds"]
-  responsive_breakpoint: "640px"
-  output_rule: "Never overwrite an existing brief; add a time suffix when needed."
+# Layout, type, colours, and the terrain drawing are fixed in
+# scripts/render_brief.py so every run looks the same.

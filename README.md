@@ -2,34 +2,33 @@
 
 A calm, personalized morning briefing skill for ChatGPT and Codex.
 
-Morning Brief turns connected calendar and inbox context, local weather, verified news, a technology radar, and one approachable concept into a single polished HTML briefing. The opening stays easy to scan, while the news, technology analysis, and concept sections provide enough depth to be useful.
+Morning Brief is a 30-second morning glance. The top half draws your day as terrain with three short observations. The bottom half lists what needs you and what has already resolved. Weather, verified news, a technology radar, and a concept of the day are optional sections that you turn on in your profile.
+
+The model never writes HTML. It fills one JSON file (`references/brief.schema.json`), and a fixed Python renderer turns it into the page. Layout, typography, the terrain drawing, escaping, and link checks are therefore identical on every run, whichever model produced the content.
 
 > This is an independent open-source project. It is not affiliated with or endorsed by OpenAI.
 
 ## Features
 
-- Summarizes the shape of today from connected calendars
-- Writes a one-sentence editorial headline about the character of the day
-- Describes the schedule in three natural, narrative time windows
-- Separates items that need attention from recently resolved matters
-- Explains each attention or resolved item with its date, status, deadline, and relevance
-- Supports archived and inbox email searches
-- Uses configurable locations and authoritative weather sources
-- Groups verified news into five configurable categories with up to two items each
-- Synthesizes two or three connected technology currents instead of listing article summaries
-- Explains one approachable concept from analogy through mechanism, practical meaning, and limitations
-- Produces one responsive, standalone HTML file
-- Bundles its fonts and font license notices into the generated HTML
-- Keeps all source connectors read-only while creating a brief
-- Supports unattended recurring runs when the host platform provides automations
+- Draws today's calendar as one terrain line: elevation shows load, and dots sit on the line, sized by meeting length
+- Classifies the day as HEAVY, NORMAL, or OPEN, and writes a one-sentence headline in that register
+- Describes the day in three acts that follow the real calendar
+- Separates **Needs attention** from **Resolved**, after opening each thread to confirm it is still open
+- Adds prep items for tomorrow's meetings, based on the project's recent chat and linked docs
+- Skips group @-mentions and treats an emoji reaction as a reply
+- Optional weather, news, tech-radar, and concept sections, each with its own verification rules
+- Optional action buttons that open a prefilled ChatGPT chat, only when the exact opt-in phrase is present
+- One standalone, responsive HTML file with embedded fonts and font license notices
+- A structural verifier that checks the rendered page before delivery
+- Read-only access to every source connector
 
 ## Requirements
 
 - ChatGPT or Codex with skill support
-- The connectors needed by your profile, such as Google Calendar and Gmail
-- Web access for current weather and news
-- Node.js only when using the bundled font-inlining script
-- A browser for the recommended visual verification step
+- Python 3.8+ (standard library only) for `scripts/render_brief.py` and `scripts/verify_brief.py`
+- The connectors your profile needs, such as Google Calendar, Gmail, and Slack
+- Web access for the optional weather and news sections
+- Optional: a browser for a screenshot check
 
 Missing connectors are skipped gracefully. Morning Brief never invents private data, locations, schedules, or weather values.
 
@@ -65,14 +64,13 @@ Edit only the values you need. The profile supports:
 - home and commute locations
 - included calendars and holiday calendars
 - vacation, return-to-work, and explicit-workday keywords
-- inbox lookback and classification rules
-- preferred weather and air-quality sources
-- news categories and item counts
-- editorial voice, headline style, narrative schedule observations, and list depth
-- technology-radar flows and concept-of-the-day depth
-- exact layout, type scale, numbered-list treatment, and terrain decoration
-- section order, relationships, and delivery caption
+- inbox and chat lookback and classification rules
+- action buttons (off by default)
+- optional sections (weather, news, tech radar, concept), with their order, headings, and rules
+- relationships and delivery caption
 - automation schedule and success-notification preference
+
+The design is not configurable in the profile. It lives in `scripts/render_brief.py`, so every run renders the same way.
 
 `references/profile.yaml` is intentionally excluded by `.gitignore` because it may contain personal information. Do not put passwords, API keys, OAuth tokens, or other secrets in it.
 
@@ -93,10 +91,10 @@ Create my morning brief for today.
 For an unattended run, use a prompt similar to:
 
 ```text
-Use $morning-brief to create my morning brief for today in my configured
-timezone. Read references/profile.yaml, use connected sources read-only,
-save one standalone HTML file, visually verify it when possible, and notify
-me after a successful delivery.
+Use $morning-brief to create my morning brief for today in Korean, in the
+Asia/Seoul timezone. Read references/profile.yaml and use connected sources
+read-only. Write brief.json, render it with scripts/render_brief.py, run
+scripts/verify_brief.py until it prints OK, and deliver the HTML file.
 ```
 
 Create the recurring schedule with the automation feature of the host platform. The skill itself does not install a background service or silently create a schedule.
@@ -118,9 +116,29 @@ For a cloud scheduled task, explicitly select or invoke the uploaded skill and k
 ```text
 Use $morning-brief and read references/profile.yaml. Apply safety, read-only,
 and fact-verification rules first; then explicit run-specific choices in this
-prompt; then profile.yaml; then general SKILL.md defaults. Create one verified
-standalone HTML brief in the configured language and timezone.
+prompt; then profile.yaml; then general SKILL.md defaults. Write brief.json,
+render it with scripts/render_brief.py, and deliver it only after
+scripts/verify_brief.py prints OK. Write in the configured language and timezone.
 ```
+
+Before relying on the schedule, run it once by hand. Confirm that the host can execute `python3` inside the skill directory and can reach your connectors from a scheduled run.
+
+## How a run works
+
+1. Gather from connected tools, read-only.
+2. Sort candidates into Needs attention and Resolved.
+3. Write `brief.json` following `references/brief.schema.json`. `references/brief.example.json` is a complete example.
+4. `python3 scripts/render_brief.py brief.json` writes `outputs/brief-YYYY-MM-DD.html`. It never overwrites an earlier brief.
+5. `python3 scripts/verify_brief.py outputs/brief-YYYY-MM-DD.html` must print `OK`. If it does not, fix the JSON and render again.
+6. Deliver the HTML file.
+
+To add action buttons to a scheduled run, put this exact line in the task prompt:
+
+```text
+Include action buttons
+```
+
+Buttons open `https://chatgpt.com/?q=…` with a self-contained work order that never quotes third-party messages.
 
 ## Output
 
@@ -129,7 +147,7 @@ The generated briefing uses:
 - two full-width background bands around an 860px editorial column
 - a warm, conversational voice that stays precise about facts
 - open numbered rows rather than cards, badges, boxes, or dashboard chrome
-- a calendar terrain line with markers calculated from the SVG path
+- a calendar terrain line with markers calculated from the SVG path, plus at most one motif per act and one clay accent
 - an explicit desktop and mobile typography hierarchy
 - explicitly styled dark-gray links in every browser state
 - responsive layout for desktop and mobile
@@ -145,13 +163,13 @@ The repository includes offline WOFF2 data in `assets/fonts/fonts-embedded.css` 
 - Morning Maru SemiBold, an OFL-compliant renamed and modified subset of MaruBuri
 - Noto Serif KR 600
 
-Run the inlining helper after creating an HTML file containing the marker `/* __EMBEDDED_FONT_CSS__ */`:
+`scripts/render_brief.py` embeds the font CSS automatically. It verifies that the CSS contains only local WOFF2 data and that all three OFL notices are present, then writes those notices into the HTML as a readable CSS comment. If anything is missing, the headline falls back to the system serif and the renderer prints a warning.
+
+`scripts/inline-font-css.mjs` is kept for hand-written HTML that contains the `/* __EMBEDDED_FONT_CSS__ */` marker:
 
 ```text
 node scripts/inline-font-css.mjs <input.html> assets/fonts/fonts-embedded.css <output.html>
 ```
-
-The helper verifies the font CSS and embeds the complete bundled OFL notices into the standalone HTML as a readable CSS comment.
 
 Font license files:
 
@@ -183,8 +201,12 @@ morning-brief/
 ├── agents/
 │   └── openai.yaml
 ├── references/
+│   ├── brief.schema.json
+│   ├── brief.example.json
 │   └── profile.example.yaml
 ├── scripts/
+│   ├── render_brief.py
+│   ├── verify_brief.py
 │   └── inline-font-css.mjs
 └── assets/
     └── fonts/
@@ -198,7 +220,8 @@ morning-brief/
 ## Limitations
 
 - Results depend on connector availability and the quality of the configured sources.
-- Visual verification depends on browser access in the execution environment.
+- Screenshot checks depend on browser access. Without a browser, `verify_brief.py` is the structural check.
+- Buttons open ChatGPT with a prefilled prompt. The ChatGPT chat has no access to the brief's sources unless the same connectors are enabled there.
 - Push notifications and scheduled execution are host-platform features, not implemented by this repository.
 - The skill omits uncertain information rather than filling gaps with guesses.
 
