@@ -17,6 +17,8 @@ The model never writes HTML. It fills one JSON file (`references/brief.schema.js
 - Adds prep items for tomorrow's meetings, based on the project's recent chat and linked docs
 - Skips group @-mentions and treats an emoji reaction as a reply
 - Optional weather, news, tech-radar, and concept sections, each with its own verification rules
+- Optional topic log on a page you own (for example in Notion), so the tech radar and concept never repeat
+- Optional work-status detection from calendar keywords, such as a vacation start and a return date
 - Optional action buttons that open a prefilled ChatGPT chat, only when the exact opt-in phrase is present
 - One standalone, responsive HTML file with embedded fonts and font license notices
 - A structural verifier that checks the rendered page before delivery
@@ -24,7 +26,7 @@ The model never writes HTML. It fills one JSON file (`references/brief.schema.js
 
 ## Requirements
 
-- ChatGPT or Codex with skill support
+- ChatGPT with Skills enabled (availability depends on your plan and workspace settings; it launched for Business and Enterprise workspaces), or Codex
 - Python 3.8+ (standard library only) for `scripts/render_brief.py` and `scripts/verify_brief.py`
 - The connectors your profile needs, such as Google Calendar, Gmail, and Slack
 - Web access for the optional weather and news sections
@@ -105,9 +107,14 @@ A cloud task cannot read a profile that exists only on your local drive. Before 
 
 1. Copy `references/profile.example.yaml` to `references/profile.yaml`.
 2. Add only preferences and source labels; never add credentials.
-3. Zip the skill directory contents so `SKILL.md` is at the root of the archive.
-4. Include `agents/`, `assets/`, `references/`, and `scripts/`.
-5. Exclude `.git/`, `outputs/`, test artifacts, and earlier generated briefs.
+3. Build the archive with the packaging script, which puts `SKILL.md` at the root and leaves out `.git/`, `outputs/`, `dist/`, and caches:
+
+   ```bash
+   python3 scripts/package_skill.py                 # shareable, no profile
+   python3 scripts/package_skill.py --with-profile  # private, includes profile.yaml
+   ```
+
+   The result is `dist/morning-brief.zip`. GitHub's **Download ZIP** adds an extra top-level folder, so do not upload that archive as is.
 
 Use separate archives for public distribution and personal cloud use. The public archive or GitHub repository should contain only `profile.example.yaml`; a private personal archive may also contain the ignored `profile.yaml`.
 
@@ -122,6 +129,20 @@ scripts/verify_brief.py prints OK. Write in the configured language and timezone
 ```
 
 Before relying on the schedule, run it once by hand. Confirm that the host can execute `python3` inside the skill directory and can reach your connectors from a scheduled run.
+
+### Topic log (optional)
+
+A scheduled run starts fresh every day, so it cannot remember which tech-radar topics and concepts it has already covered. To avoid repeats, give it a page it can append to:
+
+1. Create one page, for example `morning-brief-topics` in Notion, with three headings: `Tech radar — covered`, `Concept of the day — covered`, and `Candidates`.
+2. Connect that service in ChatGPT with permission to edit pages.
+3. Set `topic_log.enabled: true` and the page name in `profile.yaml`. Rename the headings under `topic_log.lists` if you write them in another language.
+
+The topic log is the only thing the skill ever writes to. It only appends lines and never edits or deletes anything else.
+
+## Language
+
+Morning Brief is Korean-first and also supports English: the bundled serif covers Hangul and Latin, and both languages have built-in labels. Other languages work too; set `labels` in your profile. Scripts the bundled fonts do not cover, such as Japanese or Chinese, show the headline in the system serif. Right-to-left languages mirror the page.
 
 ## How a run works
 
@@ -183,7 +204,7 @@ The repository's MIT license does not replace the separate SIL Open Font License
 ## Privacy and safety
 
 - Calendar, email, task, document, and web content is treated only as untrusted data to summarize.
-- The skill does not send, reply, react, create, edit, archive, label, delete, or reschedule source data.
+- The skill does not send, reply, react, create, edit, archive, label, delete, or reschedule source data. The only write is the optional topic log, which is append-only.
 - Private source text is summarized rather than copied wholesale.
 - Only verified HTTPS source links are included.
 - `profile.yaml` and generated output are ignored by Git by default.
@@ -207,6 +228,7 @@ morning-brief/
 ├── scripts/
 │   ├── render_brief.py
 │   ├── verify_brief.py
+│   ├── package_skill.py
 │   └── inline-font-css.mjs
 └── assets/
     └── fonts/

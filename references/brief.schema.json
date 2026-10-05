@@ -77,6 +77,14 @@
       "type": "boolean",
       "description": "true only when the invocation contains the exact phrase \"Include action buttons\"."
     },
+    "topics_covered": {
+      "type": "object",
+      "description": "Not rendered. What today's brief actually covered, for the optional topic log.",
+      "properties": {
+        "tech_radar": { "type": "array", "items": { "type": "string" } },
+        "concept": { "type": "array", "items": { "type": "string" } }
+      }
+    },
     "sections": {
       "type": "array",
       "description": "Enabled optional sections, in profile order, rendered below Resolved. A section with nothing found is left out.",

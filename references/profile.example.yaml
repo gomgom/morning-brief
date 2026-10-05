@@ -26,11 +26,15 @@ calendar:
   holiday_calendars: []
   home_timezone: "Use identity.timezone"
   work_status:
+    # Optional. Infers whether you are on a long break (for example a school
+    # vacation) from the most recent keyword event before today.
     enabled: false
     calendar: ""
+    lookback_days: 200
     off_period_keywords: ["vacation start"]
     return_keywords: ["return to work"]
     explicit_workday_keywords: ["workday"]
+    rule: "If the most recent match is an off-period keyword, the user is off; if it is a return keyword, they are working. An explicit-workday event today means working."
 
 inbox:
   providers: ["connected email"]
@@ -52,6 +56,27 @@ chat:
   lookback_days: 2
   reply_rule: "An emoji reaction to the ask counts as a reply."
   prep_search_days: 7
+
+labels:
+  # Headings for the two core lists and the calm empty line, in your language.
+  # Korean and English have built-in defaults; other languages must set these.
+  attention: "Needs attention"
+  resolved: "Resolved"
+  empty: "Nothing needs you this morning."
+
+topic_log:
+  # Optional memory so the tech radar and concept do not repeat. Needs a
+  # connector that can append to a page (for example Notion).
+  enabled: false
+  provider: "Notion"
+  page: "morning-brief-topics"
+  lists:
+    tech_radar: "Tech radar — covered"
+    concept: "Concept of the day — covered"
+    candidates: "Candidates"
+  line_format: "YYYY-MM-DD · topic"
+  compress_after: 60
+  compress_rule: "Keep the newest entries with dates; reduce older entries to the topic only."
 
 buttons:
   # Buttons render only when the run prompt contains the exact phrase
