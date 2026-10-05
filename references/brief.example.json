@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-05",
+  "lang": "ko",
+  "date_line": "월요일 · 2026년 10월 5일",
+  "headline": "오전에 회의가 몰려 있다가, 지수님, 오후 세 시부터는 하루가 넓게 열려요.",
+  "day_class": "HEAVY",
+  "acts": [
+    {
+      "start": "08:00",
+      "end": "12:30",
+      "range": "오전 8시 – 오후 12:30",
+      "sentence": "9시 주간 회의부터 11시 디자인 리뷰까지 세 개의 일정이 쉬는 틈 없이 이어져요."
+    },
+    {
+      "start": "12:30",
+      "end": "15:00",
+      "range": "오후 12:30 – 3시",
+      "sentence": "점심 뒤 1시 반 고객 통화는 2시 채용 면접과 30분 겹쳐 있어요."
+    },
+    {
+      "start": "15:00",
+      "end": "20:00",
+      "range": "오후 3시 이후",
+      "sentence": "남은 일정은 5시 선택 참석 세미나 하나뿐이라 저녁까지 길게 비어 있어요."
+    }
+  ],
+  "events": [
+    {
+      "start": "09:00",
+      "end": "10:00"
+    },
+    {
+      "start": "10:00",
+      "end": "11:00"
+    },
+    {
+      "start": "11:00",
+      "end": "12:00"
+    },
+    {
+      "start": "13:30",
+      "end": "14:30",
+      "overlap": true
+    },
+    {
+      "start": "14:00",
+      "end": "15:00",
+      "overlap": true
+    },
+    {
+      "start": "17:00",
+      "end": "18:00",
+      "optional": true
+    }
+  ],
+  "motifs": [
+    {
+      "kind": "ridge"
+    },
+    {
+      "kind": "birds",
+      "act": 2,
+      "clay": true
+    }
+  ],
+  "attention": [
+    {
+      "title": "분기 예산안 검토 의견 보내기",
+      "sentence": "민호님이 금요일 오후 메일로 \"화요일 오전까지 의견 부탁드려요\"라고 요청했고, 오늘 안에 보지 않으면 마감에 닿기 어려워요.",
+      "url": "https://mail.google.com/mail/u/0/#inbox/EXAMPLE",
+      "source_phrase": "메일로"
+    },
+    {
+      "title": "내일 출시 회의 아젠다 정리",
+      "sentence": "내일 10시 출시 회의는 지수님이 주최하고, 지난주 #launch 채널에 남은 미결 항목 두 개가 아젠다의 출발점이 될 수 있어요.",
+      "url": "https://calendar.google.com/calendar/r/day/2026/10/6",
+      "source_phrase": "#launch 채널"
+    }
+  ],
+  "resolved": [
+    {
+      "title": "디자인 시안 피드백 정리됨",
+      "sentence": "어제 저녁 #design 스레드에서 서연님이 남은 질문에 답해 시안 B로 정리됐어요.",
+      "url": "https://example.slack.com/archives/EXAMPLE",
+      "source_phrase": "#design 스레드"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "날씨",
+      "paragraphs": [
+        "서울은 낮 최고 22도, 아침 최저 13도로 맑아요. 퇴근 무렵 바람이 조금 강해져요."
+      ]
+    },
+    {
+      "heading": "뉴스",
+      "items": [
+        {
+          "title": "예시 뉴스 제목",
+          "sentence": "10월 4일 보도에 따르면 예시 기관이 관련 수치를 발표했어요. 실제 브리핑에서는 검증된 출처와 날짜만 들어가요.",
+          "url": "https://example.com/news",
+          "source_phrase": "10월 4일 보도"
+        }
+      ]
+    }
+  ],
+  "topics_covered": {
+    "tech_radar": [],
+    "concept": []
+  }
+}

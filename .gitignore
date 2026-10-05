@@ -12,3 +12,8 @@ brief.png
 # Operating-system metadata
 .DS_Store
 Thumbs.db
+
+# Python bytecode and packaged skills
+__pycache__/
+*.pyc
+dist/
