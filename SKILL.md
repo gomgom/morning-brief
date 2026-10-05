@@ -198,11 +198,11 @@ When buttons are enabled, add a `button` only where a fresh ChatGPT chat could a
 
 ## Build
 
-1. Write `brief.json` that follows `references/brief.schema.json`. Use `references/brief.example.json` as the reference shape.
+1. Write `outputs/brief.json` that follows `references/brief.schema.json`, with `timezone` set to the home timezone. Use `references/brief.example.json` as the reference shape. Never render or deliver the example itself during a real run.
 2. Run:
 
    ```text
-   python3 scripts/render_brief.py brief.json
+   python3 scripts/render_brief.py outputs/brief.json
    ```
 
    It writes `outputs/brief-YYYY-MM-DD.html` and never overwrites an earlier brief; it adds a time suffix instead. It embeds `assets/fonts/fonts-embedded.css` and the three OFL notices. If the font files are missing it warns and falls back to system serif. Never download replacement fonts.
